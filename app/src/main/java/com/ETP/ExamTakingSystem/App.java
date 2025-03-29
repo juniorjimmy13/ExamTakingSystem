@@ -7,6 +7,7 @@ import com.ETP.ExamTakingSystem.UI.ExamManagement;
 import com.ETP.ExamTakingSystem.UI.StudentManagment;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -31,8 +32,10 @@ public class App extends Application{
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
         layout.getChildren().addAll(welcomeLabel, manageStudentsBtn, manageExamsBtn, logoutBtn);
+        layout.setAlignment(Pos.CENTER);
+        
 
-        Scene scene = new Scene(layout, 300, 200);
+        Scene scene = new Scene(layout, 1920, 1080);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
