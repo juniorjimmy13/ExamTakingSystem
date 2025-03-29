@@ -4,6 +4,7 @@
 package com.ETP.ExamTakingSystem;
 
 import com.ETP.ExamTakingSystem.UI.ExamManagement;
+import com.ETP.ExamTakingSystem.UI.StudentLogin;
 import com.ETP.ExamTakingSystem.UI.StudentManagment;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -24,14 +25,16 @@ public class App extends Application{
         Button manageStudentsBtn = new Button("Manage Students");
         Button manageExamsBtn = new Button("Manage Exams");
         Button logoutBtn = new Button("Logout");
+        Button TestBtn = new Button("TestClient");
 
         manageStudentsBtn.setOnAction(e -> StudentManagment.showWindow());
         manageExamsBtn.setOnAction(e -> ExamManagement.showWindow());
+        TestBtn.setOnAction(e-> StudentLogin.showWindow());
         logoutBtn.setOnAction(e -> primaryStage.close());
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
-        layout.getChildren().addAll(welcomeLabel, manageStudentsBtn, manageExamsBtn, logoutBtn);
+        layout.getChildren().addAll(welcomeLabel, manageStudentsBtn, manageExamsBtn,TestBtn, logoutBtn);
         layout.setAlignment(Pos.CENTER);
         
 

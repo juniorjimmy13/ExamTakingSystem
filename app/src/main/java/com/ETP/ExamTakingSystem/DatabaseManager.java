@@ -71,6 +71,24 @@ public class DatabaseManager {
                 FOREIGN KEY (student_id) REFERENCES users(id),
                 FOREIGN KEY (exam_id) REFERENCES exams(id)
             );
+            CREATE TABLE IF NOT EXISTS student_answers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER,
+                exam_id INTEGER,
+                question_id INTEGER,
+                selected_option TEXT CHECK(selected_option IN ('A','B','C','D')),
+                FOREIGN KEY(student_id) REFERENCES users(id),
+                FOREIGN KEY(exam_id) REFERENCES exams(id),
+                FOREIGN KEY(question_id) REFERENCES questions(id)
+            );
+            CREATE TABLE IF NOT EXISTS results (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER,
+                exam_id INTEGER,
+                score INTEGER,
+                FOREIGN KEY (student_id) REFERENCES users(id),
+                FOREIGN KEY (exam_id) REFERENCES exams(id)
+            );
         """;
 
         try (Connection conn = connect();
