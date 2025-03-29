@@ -47,9 +47,25 @@ public class StudentManagment {
                 loadStudents(studentList);
             }
         });
+        
+        Button assignExamBtn = new Button("Assign Exam to Student");
+       
+
+        assignExamBtn.setOnAction(e -> {
+        String selectedStudent = studentList.getSelectionModel().getSelectedItem();
+            if (selectedStudent != null) {
+                   assignExamToStudent(selectedStudent);
+            }    
+            else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Please select a student first.");
+                alert.show();
+                }
+            });
+
 
         VBox layout = new VBox(10);
         layout.getChildren().addAll(studentList, addStudentBtn, deleteStudentBtn);
+        layout.getChildren().add(assignExamBtn);
 
         Scene scene = new Scene(layout, 300, 400);
         window.setScene(scene);
@@ -90,5 +106,46 @@ public class StudentManagment {
             System.out.println("Error deleting student: " + e.getMessage());
         }
     }
+    private static void assignExamToStudent(String username) {
+    try (Connection conn = DatabaseManager.connect()) {
+        // Get all exams
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT id, title FROM exams");
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>();
+        while (rs.next()) {
+            dialog.getItems().add(rs.getInt("id") + " - " + rs.getString("title"));
+        }
+        dialog.setTitle("Assign Exam");
+        dialog.setHeaderText("Select an exam for: " + username);
+
+        dialog.showAndWait().ifPresent(selected -> {
+            int examId = Integer.parseInt(selected.split(" - ")[0]);
+            try {
+                // Get student ID
+                PreparedStatement getIdStmt = conn.prepareStatement("SELECT id FROM users WHERE username = ?");
+                getIdStmt.setString(1, username);
+                ResultSet idRs = getIdStmt.executeQuery();
+                if (idRs.next()) {
+                    int studentId = idRs.getInt("id");
+
+                    // Link student to exam
+                    PreparedStatement insertStmt = conn.prepareStatement("INSERT OR IGNORE INTO student_exams (student_id, exam_id) VALUES (?, ?)");
+                    insertStmt.setInt(1, studentId);
+                    insertStmt.setInt(2, examId);
+                    insertStmt.executeUpdate();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Exam assigned successfully.");
+                    alert.show();
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error assigning exam: " + ex.getMessage());
+            }
+        });
+
+    } catch (SQLException e) {
+        System.out.println("Error loading exams: " + e.getMessage());
+    }
+}
+
 }
 

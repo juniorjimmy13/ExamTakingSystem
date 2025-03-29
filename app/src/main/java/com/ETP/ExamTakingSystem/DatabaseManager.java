@@ -54,6 +54,14 @@ public class DatabaseManager {
                 correct_option TEXT CHECK(correct_option IN ('A', 'B', 'C', 'D')) NOT NULL,
                 FOREIGN KEY (exam_id) REFERENCES exams(id)
             );
+            
+            CREATE TABLE IF NOT EXISTS student_exams (
+                student_id INTEGER,
+                exam_id INTEGER,
+                PRIMARY KEY (student_id, exam_id),
+                FOREIGN KEY (student_id) REFERENCES users(id),
+                FOREIGN KEY (exam_id) REFERENCES exams(id)
+            );
 
             CREATE TABLE IF NOT EXISTS results (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
