@@ -89,6 +89,14 @@ public class DatabaseManager {
                 FOREIGN KEY (student_id) REFERENCES users(id),
                 FOREIGN KEY (exam_id) REFERENCES exams(id)
             );
+                     CREATE TABLE IF NOT EXISTS student_results (
+                         id INTEGER PRIMARY KEY AUTOINCREMENT,
+                         student_id INTEGER,
+                         exam_id INTEGER,
+                         score INTEGER,
+                         FOREIGN KEY (student_id) REFERENCES users(id),
+                         FOREIGN KEY (exam_id) REFERENCES exams(id)
+                     );
         """;
 
         try (Connection conn = connect();

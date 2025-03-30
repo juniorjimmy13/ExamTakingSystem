@@ -100,32 +100,74 @@ public class ExamTakingWindow {
     }
 
     private static void submitAnswers(String studentUsername, String examTitle) {
-        try (Connection conn = DatabaseManager.connect()) {
-            int studentId = getId(conn, "users", "username", studentUsername);
-            int examId = getId(conn, "exams", "title", examTitle);
+    try (Connection conn = DatabaseManager.connect()) {
+        int studentId = getId(conn, "users", "username", studentUsername);
+        int examId = getId(conn, "exams", "title", examTitle);
 
-            for (Map.Entry<Integer, ToggleGroup> entry : questionAnswers.entrySet()) {
-                int questionId = entry.getKey();
-                ToggleGroup group = entry.getValue();
-                RadioButton selected = (RadioButton) group.getSelectedToggle();
-                if (selected != null) {
-                    String answer = selected.getText().substring(0, 1); // Get "A", "B", etc.
-                    String sql = "INSERT INTO student_answers (student_id, exam_id, question_id, selected_option) VALUES (?, ?, ?, ?)";
-                    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                        pstmt.setInt(1, studentId);
-                        pstmt.setInt(2, examId);
-                        pstmt.setInt(3, questionId);
-                        pstmt.setString(4, answer);
-                        pstmt.executeUpdate();
-                    }
+        int correctCount = 0;
+        int totalQuestions = questionAnswers.size();
+
+        for (Map.Entry<Integer, ToggleGroup> entry : questionAnswers.entrySet()) {
+            int questionId = entry.getKey();
+            ToggleGroup group = entry.getValue();
+            RadioButton selected = (RadioButton) group.getSelectedToggle();
+            
+            if (selected != null) {
+                String selectedAnswer = selected.getText().substring(0, 1); // Extract "A", "B", etc.
+
+                // Get correct answer from database
+                String correctAnswer = getCorrectAnswer(conn, questionId);
+
+                // Check if the answer is correct
+                if (selectedAnswer.equals(correctAnswer)) {
+                    correctCount++;
+                }
+
+                // Store student answer
+                String sql = "INSERT INTO student_answers (student_id, exam_id, question_id, selected_option) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setInt(1, studentId);
+                    pstmt.setInt(2, examId);
+                    pstmt.setInt(3, questionId);
+                    pstmt.setString(4, selectedAnswer);
+                    pstmt.executeUpdate();
                 }
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Exam submitted successfully.");
-            alert.show();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+
+        // Calculate percentage score
+        int score = (int) (((double) correctCount / totalQuestions) * 100);
+
+        // Store the score in student_results
+        String insertResultSql = "INSERT INTO student_results (student_id, exam_id, score) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(insertResultSql)) {
+            pstmt.setInt(1, studentId);
+            pstmt.setInt(2, examId);
+            pstmt.setInt(3, score);
+            pstmt.executeUpdate();
+        }
+
+        // Show confirmation
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Exam submitted! Your score: " + score + "%");
+        alert.show();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+// Helper method to get the correct answer for a question
+private static String getCorrectAnswer(Connection conn, int questionId) throws SQLException {
+    String sql = "SELECT correct_option FROM questions WHERE id = ?";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setInt(1, questionId);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            return rs.getString("correct_option");
         }
     }
+    return "";
+}
+
 
     private static int getId(Connection conn, String table, String field, String value) throws SQLException {
         String sql = "SELECT id FROM " + table + " WHERE " + field + "=?";
