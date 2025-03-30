@@ -23,6 +23,7 @@ public class StudentManagment {
         ListView<String> studentList = new ListView<>();
         Button addStudentBtn = new Button("Add Student");
         Button deleteStudentBtn = new Button("Delete Selected");
+        Button viewResultsBtn = new Button("View Results");
 
         loadStudents(studentList);
 
@@ -63,8 +64,18 @@ public class StudentManagment {
             });
 
 
+        viewResultsBtn.setOnAction(e -> {
+            String selectedStudent = studentList.getSelectionModel().getSelectedItem();
+            if (selectedStudent != null) {
+                showStudentResults(selectedStudent);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Please select a student first.");
+                alert.show();
+            }
+        });
+
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(studentList, addStudentBtn, deleteStudentBtn);
+        layout.getChildren().addAll(studentList, addStudentBtn, deleteStudentBtn, viewResultsBtn);
         layout.getChildren().add(assignExamBtn);
 
         Scene scene = new Scene(layout, 300, 400);
@@ -146,6 +157,94 @@ public class StudentManagment {
         System.out.println("Error loading exams: " + e.getMessage());
     }
 }
+    private static void showStudentResults(String studentUsername) {
+        Stage resultWindow = new Stage();
+        resultWindow.setTitle("Results for: " + studentUsername);
 
+        ListView<String> resultList = new ListView<>();
+        loadStudentResults(studentUsername, resultList);
+
+        resultList.setOnMouseClicked(e -> {
+            String selectedResult = resultList.getSelectionModel().getSelectedItem();
+            if (selectedResult != null) {
+                int examId = Integer.parseInt(selectedResult.split(" - ")[0]);
+                showDetailedResults(studentUsername, examId);
+            }
+        });
+
+        VBox layout = new VBox(10, resultList);
+        Scene scene = new Scene(layout, 300, 400);
+        resultWindow.setScene(scene);
+        resultWindow.show();
+    }
+
+    private static void loadStudentResults(String studentUsername, ListView<String> resultList) {
+        resultList.getItems().clear();
+        try (Connection conn = DatabaseManager.connect()) {
+            int studentId = getId(conn, "users", "username", studentUsername);
+            String sql = "SELECT e.id, e.title, sr.score FROM student_results sr " +
+                         "JOIN exams e ON sr.exam_id = e.id WHERE sr.student_id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, studentId);
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    int examId = rs.getInt("id");
+                    String examTitle = rs.getString("title");
+                    int score = rs.getInt("score");
+                    resultList.getItems().add(examId + " - " + examTitle + " | Score: " + score + "%");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void showDetailedResults(String studentUsername, int examId) {
+        Stage detailsWindow = new Stage();
+        detailsWindow.setTitle("Exam Review");
+
+        ListView<String> answersList = new ListView<>();
+        loadExamAnswers(studentUsername, examId, answersList);
+
+        VBox layout = new VBox(10, answersList);
+        Scene scene = new Scene(layout, 400, 500);
+        detailsWindow.setScene(scene);
+        detailsWindow.show();
+    }
+
+    private static void loadExamAnswers(String studentUsername, int examId, ListView<String> answersList) {
+        answersList.getItems().clear();
+        try (Connection conn = DatabaseManager.connect()) {
+            int studentId = getId(conn, "users", "username", studentUsername);
+            String sql = "SELECT q.question_text, q.correct_option, sa.selected_option FROM student_answers sa " +
+                         "JOIN questions q ON sa.question_id = q.id WHERE sa.student_id = ? AND sa.exam_id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, studentId);
+                pstmt.setInt(2, examId);
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    String question = rs.getString("question_text");
+                    String correct = rs.getString("correct_option");
+                    String chosen = rs.getString("selected_option");
+
+                    String status = chosen.equals(correct) ? "✔ Correct" : "✘ Incorrect";
+                    answersList.getItems().add(question + "\nYour Answer: " + chosen + " | Correct: " + correct + " " + status);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static int getId(Connection conn, String table, String field, String value) throws SQLException {
+        String sql = "SELECT id FROM " + table + " WHERE " + field + "=?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, value);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) return rs.getInt("id");
+        }
+        return -1;
+    }
 }
+
 
