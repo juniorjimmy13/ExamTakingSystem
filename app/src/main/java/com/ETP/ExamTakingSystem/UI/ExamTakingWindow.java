@@ -48,13 +48,14 @@ public class ExamTakingWindow {
         submitBtn.setOnAction(e -> {
             timer.stop();
             submitAnswers(studentUsername, examTitle);
+            StudentDashboard.showWindow(studentUsername);
             window.close();
         });
 
         layout.getChildren().add(0, timerLabel);
         layout.getChildren().add(submitBtn);
 
-        window.setScene(new Scene(new ScrollPane(layout), 400, 500));
+        window.setScene(new Scene(new ScrollPane(layout), 1920, 1080));
         window.show();
         
         window.setOnCloseRequest(e -> {
@@ -62,6 +63,7 @@ public class ExamTakingWindow {
     Alert alert = new Alert(Alert.AlertType.WARNING, "Closing the exam will submit it automatically!");
     alert.showAndWait();
     submitAnswers(studentUsername, examTitle);
+    StudentDashboard.showWindow(studentUsername);
     window.close();
 });
 

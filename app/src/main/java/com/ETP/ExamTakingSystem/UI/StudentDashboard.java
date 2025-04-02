@@ -15,9 +15,13 @@ public class StudentDashboard {
         ListView<String> assignedExamsList = new ListView<>();
         Button takeExamBtn = new Button("Take Selected Exam");
         
-       // Button ViewResults = 
+       Button viewResultsBtn = new Button("View Results");
 
-        // Load assigned exams
+        viewResultsBtn.setOnAction(e -> {
+            window.close();
+            StudentResultsWindow.showWindow(studentUsername);
+            });
+        
         loadAssignedExams(studentUsername, assignedExamsList);
 
         takeExamBtn.setOnAction(e -> {
@@ -29,7 +33,7 @@ public class StudentDashboard {
         });
 
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(new Label("Assigned Exams:"), assignedExamsList, takeExamBtn);
+        layout.getChildren().addAll(new Label("Assigned Exams:"), assignedExamsList, takeExamBtn,viewResultsBtn);
         window.setScene(new Scene(layout, 400, 300));
         window.show();
     }
