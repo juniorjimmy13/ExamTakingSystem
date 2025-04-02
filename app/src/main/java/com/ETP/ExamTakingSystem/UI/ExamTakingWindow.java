@@ -56,6 +56,25 @@ public class ExamTakingWindow {
 
         window.setScene(new Scene(new ScrollPane(layout), 400, 500));
         window.show();
+        
+        window.setOnCloseRequest(e -> {
+    e.consume(); // Prevent closing
+    Alert alert = new Alert(Alert.AlertType.WARNING, "Closing the exam will submit it automatically!");
+    alert.showAndWait();
+    submitAnswers(studentUsername, examTitle);
+    window.close();
+});
+
+IntegerProperty warnings = new SimpleIntegerProperty(0); // Track cheating attempts
+
+// Detect Alt+Tab or Loss of Focus
+window.focusedProperty().addListener((obs, oldValue, newValue) -> {
+    if (!newValue) { // Window lost focus
+        warnings.set(warnings.get() + 1);
+        checkWarnings(window, studentUsername, examTitle, warnings);
+    }
+});
+
     }
 
     private static List<Question> loadQuestions(String examTitle, VBox layout) {
@@ -154,6 +173,19 @@ public class ExamTakingWindow {
         e.printStackTrace();
     }
 }
+    // Helper Method for anti cheating features
+    private static void checkWarnings(Stage window, String studentUsername, String examTitle, IntegerProperty warnings) {
+    if (warnings.get() == 1) {
+        Alert warning = new Alert(Alert.AlertType.WARNING, "Warning: Do not switch windows! Next time, the exam will be auto-submitted.");
+        warning.show();
+    } else if (warnings.get() >= 2) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "You switched windows again. Your exam has been auto-submitted.");
+        alert.show();
+        submitAnswers(studentUsername, examTitle);
+        window.close();
+    }
+}
+
 
 // Helper method to get the correct answer for a question
 private static String getCorrectAnswer(Connection conn, int questionId) throws SQLException {
