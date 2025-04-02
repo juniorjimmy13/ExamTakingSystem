@@ -11,97 +11,30 @@ package com.ETP.ExamTakingSystem;
 import java.sql.*;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:sqlite:exam_system.db";
+    private static final String URL = "jdbc:mysql://localhost:3306/exam_system";
+    private static final String USER = "root";
+    private static final String PASSWORD = ""; // Default XAMPP password is empty
 
-    // Establish a connection to the SQLite database
     public static Connection connect() {
-        Connection conn = null;
         try {
-            conn = DriverManager.getConnection(URL);
-            System.out.println("Connected to database.");
-        } catch (SQLException e) {
-            System.out.println("Database connection failed: " + e.getMessage());
+            // Load MySQL JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish connection
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            return null;
         }
-        return conn;
     }
+
 
     // Initialize database tables
     public static void initializeDatabase() {
-        String sql = """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                role TEXT CHECK(role IN ('student', 'teacher')) NOT NULL
-            );
-
-            CREATE TABLE IF NOT EXISTS exams (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                duration INTEGER NOT NULL,
-                teacher_id INTEGER,
-                FOREIGN KEY (teacher_id) REFERENCES users(id)
-            );
-
-            CREATE TABLE IF NOT EXISTS questions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                exam_id INTEGER,
-                question_text TEXT NOT NULL,
-                option_a TEXT NOT NULL,
-                option_b TEXT NOT NULL,
-                option_c TEXT NOT NULL,
-                option_d TEXT NOT NULL,
-                correct_option TEXT CHECK(correct_option IN ('A', 'B', 'C', 'D')) NOT NULL,
-                FOREIGN KEY (exam_id) REFERENCES exams(id)
-            );
-            
-            CREATE TABLE IF NOT EXISTS student_exams (
-                student_id INTEGER,
-                exam_id INTEGER,
-                PRIMARY KEY (student_id, exam_id),
-                FOREIGN KEY (student_id) REFERENCES users(id),
-                FOREIGN KEY (exam_id) REFERENCES exams(id)
-            );
-
-            CREATE TABLE IF NOT EXISTS results (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                student_id INTEGER,
-                exam_id INTEGER,
-                score INTEGER,
-                FOREIGN KEY (student_id) REFERENCES users(id),
-                FOREIGN KEY (exam_id) REFERENCES exams(id)
-            );
-            CREATE TABLE IF NOT EXISTS student_answers (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                student_id INTEGER,
-                exam_id INTEGER,
-                question_id INTEGER,
-                selected_option TEXT CHECK(selected_option IN ('A','B','C','D')),
-                FOREIGN KEY(student_id) REFERENCES users(id),
-                FOREIGN KEY(exam_id) REFERENCES exams(id),
-                FOREIGN KEY(question_id) REFERENCES questions(id)
-            );
-            CREATE TABLE IF NOT EXISTS results (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                student_id INTEGER,
-                exam_id INTEGER,
-                score INTEGER,
-                FOREIGN KEY (student_id) REFERENCES users(id),
-                FOREIGN KEY (exam_id) REFERENCES exams(id)
-            );
-                     CREATE TABLE IF NOT EXISTS student_results (
-                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                         student_id INTEGER,
-                         exam_id INTEGER,
-                         score INTEGER,
-                         FOREIGN KEY (student_id) REFERENCES users(id),
-                         FOREIGN KEY (exam_id) REFERENCES exams(id)
-                     );
-        """;
-
+        
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
+            //stmt.executeUpdate(sql);
             System.out.println("Database initialized successfully.");
         } catch (SQLException e) {
             System.out.println("Error initializing database: " + e.getMessage());

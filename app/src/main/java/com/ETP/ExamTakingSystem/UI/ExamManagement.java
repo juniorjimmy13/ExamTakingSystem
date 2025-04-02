@@ -70,6 +70,7 @@ public class ExamManagement {
 
     private static void createExam(String title) {
         String sql = "INSERT INTO exams (title, duration, teacher_id) VALUES (?, 60, 1)";
+        
         try (Connection conn = DatabaseManager.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, title);

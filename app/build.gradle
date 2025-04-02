@@ -15,12 +15,19 @@ repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
+javafx {
+    version = '17'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
 
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
+    implementation 'mysql:mysql-connector-java:8.0.33' //jdbc
     implementation 'org.xerial:sqlite-jdbc:3.42.0.0' // SQLite support
     implementation 'com.google.code.gson:gson:2.10' // JSON handling
+    
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
@@ -43,8 +50,3 @@ tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
-javafx {
-    version = '17'
-    modules = ['javafx.controls', 'javafx.fxml']
-}
-

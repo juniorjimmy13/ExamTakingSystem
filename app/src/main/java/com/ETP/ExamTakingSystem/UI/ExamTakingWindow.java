@@ -17,6 +17,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 public class ExamTakingWindow {
     private static Map<Integer, ToggleGroup> questionAnswers = new HashMap<>();
     private static Timeline timer;
+    private static boolean submitted = false;
 
     public static void showWindow(String studentUsername, String examTitle) {
         Stage window = new Stage();
@@ -48,7 +49,7 @@ public class ExamTakingWindow {
         submitBtn.setOnAction(e -> {
             timer.stop();
             submitAnswers(studentUsername, examTitle);
-            StudentDashboard.showWindow(studentUsername);
+            submitted = true;
             window.close();
         });
 
@@ -59,15 +60,18 @@ public class ExamTakingWindow {
         window.show();
         
         window.setOnCloseRequest(e -> {
+            
     e.consume(); // Prevent closing
     Alert alert = new Alert(Alert.AlertType.WARNING, "Closing the exam will submit it automatically!");
     alert.showAndWait();
     submitAnswers(studentUsername, examTitle);
     StudentDashboard.showWindow(studentUsername);
     window.close();
+            
 });
 
 IntegerProperty warnings = new SimpleIntegerProperty(0); // Track cheating attempts
+
 
 // Detect Alt+Tab or Loss of Focus
 window.focusedProperty().addListener((obs, oldValue, newValue) -> {
@@ -170,21 +174,23 @@ window.focusedProperty().addListener((obs, oldValue, newValue) -> {
 
         // Show confirmation
         Alert alert = new Alert(Alert.AlertType.INFORMATION, "Exam submitted! Your score: " + score + "%");
-        alert.show();
+        alert.showAndWait();
+        StudentDashboard.showWindow(studentUsername);
+        
     } catch (SQLException e) {
         e.printStackTrace();
     }
 }
     // Helper Method for anti cheating features
     private static void checkWarnings(Stage window, String studentUsername, String examTitle, IntegerProperty warnings) {
-    if (warnings.get() == 1) {
+    if (warnings.get() == 1 ) {
         Alert warning = new Alert(Alert.AlertType.WARNING, "Warning: Do not switch windows! Next time, the exam will be auto-submitted.");
-        warning.show();
+        warning.showAndWait();
     } else if (warnings.get() >= 2) {
         Alert alert = new Alert(Alert.AlertType.ERROR, "You switched windows again. Your exam has been auto-submitted.");
-        alert.show();
+        alert.showAndWait();
         submitAnswers(studentUsername, examTitle);
-        window.close();
+        //window.close();
     }
 }
 
