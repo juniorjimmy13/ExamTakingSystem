@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.sql.*;
+import javafx.scene.layout.HBox;
 
 public class QuestionManagement {
     public static void showWindow(String examTitle) {
@@ -100,7 +101,8 @@ public class QuestionManagement {
     Stage window = new Stage();
     window.setTitle("Questions for " + examTitle);
 
-    ListView<String> questionList = new ListView<>();
+    VBox layout = new VBox(10);
+    layout.getChildren().add(new Label("Questions:"));
 
     try (Connection conn = DatabaseManager.connect()) {
         // Get exam_id first
@@ -112,35 +114,116 @@ public class QuestionManagement {
             if (rs.next()) {
                 examId = rs.getInt("id");
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Exam not found.");
-                alert.show();
+                new Alert(Alert.AlertType.ERROR, "Exam not found.").show();
                 return;
             }
         }
 
-        // Get questions for that exam
-        String getQuestionsSQL = "SELECT question_text FROM questions WHERE exam_id = ?";
+        // Get questions
+        String getQuestionsSQL = "SELECT * FROM questions WHERE exam_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(getQuestionsSQL)) {
             pstmt.setInt(1, examId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                questionList.getItems().add(rs.getString("question_text"));
+                int qid = rs.getInt("id");
+                String text = rs.getString("question_text");
+
+                HBox questionBox = new HBox(10);
+                Label qLabel = new Label(text);
+                Button editBtn = new Button("Edit");
+                Button deleteBtn = new Button("Delete");
+
+                editBtn.setOnAction(e -> openEditWindow(qid, examTitle));
+                deleteBtn.setOnAction(e -> {
+                    deleteQuestion(qid);
+                    window.close();
+                    showQuestionList(examTitle); // Refresh list
+                });
+
+                questionBox.getChildren().addAll(qLabel, editBtn, deleteBtn);
+                layout.getChildren().add(questionBox);
             }
         }
 
     } catch (SQLException e) {
         e.printStackTrace();
-        Alert error = new Alert(Alert.AlertType.ERROR, "Error loading questions: " + e.getMessage());
-        error.show();
-        return;
+        new Alert(Alert.AlertType.ERROR, "Error loading questions: " + e.getMessage()).show();
     }
 
-    VBox layout = new VBox(10);
-    layout.getChildren().addAll(new Label("Questions:"), questionList);
-
-    Scene scene = new Scene(layout, 400, 400);
+    Scene scene = new Scene(new ScrollPane(layout), 500, 400);
     window.setScene(scene);
     window.show();
 }
+private static void openEditWindow(int questionId, String examTitle) {
+    Stage editWindow = new Stage();
+    editWindow.setTitle("Edit Question");
+
+    TextField questionField = new TextField();
+    TextField[] options = new TextField[4];
+    for (int i = 0; i < 4; i++) {
+        options[i] = new TextField();
+    }
+    ComboBox<String> correctBox = new ComboBox<>();
+    correctBox.getItems().addAll("A", "B", "C", "D");
+
+    // Load question data
+    try (Connection conn = DatabaseManager.connect()) {
+        String sql = "SELECT * FROM questions WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, questionId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                questionField.setText(rs.getString("question_text"));
+                options[0].setText(rs.getString("option_a"));
+                options[1].setText(rs.getString("option_b"));
+                options[2].setText(rs.getString("option_c"));
+                options[3].setText(rs.getString("option_d"));
+                correctBox.setValue(rs.getString("correct_option"));
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    Button saveBtn = new Button("Save Changes");
+    saveBtn.setOnAction(e -> {
+        try (Connection conn = DatabaseManager.connect()) {
+            String updateSQL = "UPDATE questions SET question_text=?, option_a=?, option_b=?, option_c=?, option_d=?, correct_option=? WHERE id=?";
+            try (PreparedStatement pstmt = conn.prepareStatement(updateSQL)) {
+                pstmt.setString(1, questionField.getText());
+                pstmt.setString(2, options[0].getText());
+                pstmt.setString(3, options[1].getText());
+                pstmt.setString(4, options[2].getText());
+                pstmt.setString(5, options[3].getText());
+                pstmt.setString(6, correctBox.getValue());
+                pstmt.setInt(7, questionId);
+                pstmt.executeUpdate();
+            }
+
+            new Alert(Alert.AlertType.INFORMATION, "Question updated successfully.").show();
+            editWindow.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    });
+
+    VBox layout = new VBox(10, questionField, options[0], options[1], options[2], options[3], correctBox, saveBtn);
+    Scene scene = new Scene(layout, 400, 300);
+    editWindow.setScene(scene);
+    editWindow.show();
+}
+private static void deleteQuestion(int questionId) {
+    try (Connection conn = DatabaseManager.connect()) {
+        String sql = "DELETE FROM questions WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, questionId);
+            stmt.executeUpdate();
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        new Alert(Alert.AlertType.ERROR, "Error deleting question: " + e.getMessage()).show();
+    }
+}
+
 
 }
