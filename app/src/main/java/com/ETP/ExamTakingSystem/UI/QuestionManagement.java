@@ -133,7 +133,11 @@ public class QuestionManagement {
                 Button editBtn = new Button("Edit");
                 Button deleteBtn = new Button("Delete");
 
-                editBtn.setOnAction(e -> openEditWindow(qid, examTitle));
+                editBtn.setOnAction(e -> {
+                    openEditWindow(qid, examTitle);
+                    window.close();
+                    
+                        });
                 deleteBtn.setOnAction(e -> {
                     deleteQuestion(qid);
                     window.close();
@@ -202,6 +206,7 @@ private static void openEditWindow(int questionId, String examTitle) {
 
             new Alert(Alert.AlertType.INFORMATION, "Question updated successfully.").show();
             editWindow.close();
+            showQuestionList(examTitle);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -211,6 +216,7 @@ private static void openEditWindow(int questionId, String examTitle) {
     Scene scene = new Scene(layout, 400, 300);
     editWindow.setScene(scene);
     editWindow.show();
+    
 }
 private static void deleteQuestion(int questionId) {
     try (Connection conn = DatabaseManager.connect()) {
