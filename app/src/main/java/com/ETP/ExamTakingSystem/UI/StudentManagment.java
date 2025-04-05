@@ -141,7 +141,7 @@ public class StudentManagment {
                     int studentId = idRs.getInt("id");
 
                     // Link student to exam
-                    PreparedStatement insertStmt = conn.prepareStatement("INSERT OR IGNORE INTO student_exams (student_id, exam_id) VALUES (?, ?)");
+                    PreparedStatement insertStmt = conn.prepareStatement("INSERT INTO student_exams (student_id, exam_id) VALUES (?, ?)");
                     insertStmt.setInt(1, studentId);
                     insertStmt.setInt(2, examId);
                     insertStmt.executeUpdate();

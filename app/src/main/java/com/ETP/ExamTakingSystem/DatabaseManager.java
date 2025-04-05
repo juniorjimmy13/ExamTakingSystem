@@ -24,7 +24,7 @@ public class DatabaseManager {
             // Establish connection for Xamp
             return DriverManager.getConnection(URL, USER, PASSWORD);
             
-            //return DriverManager.getConnection(DB_URL)// for local
+            //return DriverManager.getConnection(DB_URL) // for local
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
             return null;

@@ -49,7 +49,6 @@ public class ExamTakingWindow {
         submitBtn.setOnAction(e -> {
             timer.stop();
             submitAnswers(studentUsername, examTitle);
-            submitted = true;
             window.close();
         });
 
@@ -126,6 +125,7 @@ window.focusedProperty().addListener((obs, oldValue, newValue) -> {
 
     private static void submitAnswers(String studentUsername, String examTitle) {
     try (Connection conn = DatabaseManager.connect()) {
+        submitted = true;
         int studentId = getId(conn, "users", "username", studentUsername);
         int examId = getId(conn, "exams", "title", examTitle);
 
@@ -183,6 +183,10 @@ window.focusedProperty().addListener((obs, oldValue, newValue) -> {
 }
     // Helper Method for anti cheating features
     private static void checkWarnings(Stage window, String studentUsername, String examTitle, IntegerProperty warnings) {
+    if(submitted) {
+        return;
+    }
+    
     if (warnings.get() == 1 ) {
         Alert warning = new Alert(Alert.AlertType.WARNING, "Warning: Do not switch windows! Next time, the exam will be auto-submitted.");
         warning.showAndWait();
