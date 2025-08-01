@@ -364,9 +364,6 @@ Tests automatically:
 
 ### Test Results and Reporting
 - Test results are generated in `build/reports/tests/test/index.html`
-- Coverage reports can be generated using JaCoCo plugin
-- All tests include descriptive display names for clear result interpretation
-
 ---
 
 ## Deployment Guide
