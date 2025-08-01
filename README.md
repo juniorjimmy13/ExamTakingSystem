@@ -2,7 +2,7 @@
 
 ## Overview
 
-This system is a **network-based, JavaFX-powered Online Examination Platform**, designed for local area networks (LAN). It enables teachers to craft and administer examinations and allows students to securely take them from their machines. Developed as part of the *Programming with Frameworks* Group project.
+This system is a **network-based, JavaFX-powered Online Examination Platform**, designed for local area networks (LAN). It enables teachers to craft and administer examinations and allows students to securely take them from their machines. Developed as part of the *Programming with Frameworks* Group project. Then Further Improved upon during *Software Validation and Testing* where unit tests were implemented.
 
 ---
 
