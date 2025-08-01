@@ -57,9 +57,11 @@ public class ExamReviewWindow {
                 Label correctAnswerLabel = new Label("Correct Answer: " + correctAnswer);
 
                 if (studentAnswer.equals(correctAnswer)) {
-                    studentAnswerLabel.setStyle("-fx-text-fill: green;"); // Correct answer in green
+                    // Correct answer in green
+                    studentAnswerLabel.setStyle("-fx-text-fill: green;"); 
                 } else {
-                    studentAnswerLabel.setStyle("-fx-text-fill: red;"); // Incorrect answer in red
+                    // Incorrect answer in red
+                    studentAnswerLabel.setStyle("-fx-text-fill: red;"); 
                 }
 
                 layout.getChildren().addAll(questionLabel, studentAnswerLabel, correctAnswerLabel, new Label(" "));

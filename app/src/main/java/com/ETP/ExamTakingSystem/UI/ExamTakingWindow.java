@@ -59,8 +59,9 @@ public class ExamTakingWindow {
         window.show();
         
         window.setOnCloseRequest(e -> {
-            
-    e.consume(); // Prevent closing
+           
+    // Prevent closing
+    e.consume(); 
     Alert alert = new Alert(Alert.AlertType.WARNING, "Closing the exam will submit it automatically!");
     alert.showAndWait();
     submitAnswers(studentUsername, examTitle);
@@ -113,7 +114,8 @@ window.focusedProperty().addListener((obs, oldValue, newValue) -> {
                 rb.setToggleGroup(tg);
                 rc.setToggleGroup(tg);
                 rd.setToggleGroup(tg);
-
+                
+               // iterating through each question then adding them to the list
                 layout.getChildren().addAll(questionLabel, ra, rb, rc, rd);
                 questionAnswers.put(qid, tg);
             }
@@ -138,9 +140,10 @@ window.focusedProperty().addListener((obs, oldValue, newValue) -> {
             RadioButton selected = (RadioButton) group.getSelectedToggle();
             
             if (selected != null) {
-                String selectedAnswer = selected.getText().substring(0, 1); // Extract "A", "B", etc.
+                // Extract "A", "B", and the rest
+                String selectedAnswer = selected.getText().substring(0, 1); 
 
-                // Get correct answer from database
+                // Get correct answer from database everything is being done client side for now
                 String correctAnswer = getCorrectAnswer(conn, questionId);
 
                 // Check if the answer is correct
@@ -148,7 +151,7 @@ window.focusedProperty().addListener((obs, oldValue, newValue) -> {
                     correctCount++;
                 }
 
-                // Store student answer
+                // Store student answer in the table 
                 String sql = "INSERT INTO student_answers (student_id, exam_id, question_id, selected_option) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                     pstmt.setInt(1, studentId);
@@ -223,6 +226,7 @@ private static String getCorrectAnswer(Connection conn, int questionId) throws S
         return -1;
     }
 
+    // this is based on the way we store questions on the database
     private static class Question {
         int id;
         String text, a, b, c, d;

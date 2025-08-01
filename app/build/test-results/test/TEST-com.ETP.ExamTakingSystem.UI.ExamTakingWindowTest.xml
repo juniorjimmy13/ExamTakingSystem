@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2025-08-01T06:59:45" hostname="JIMMY" time="4.616">
+  <properties/>
+  <testcase name="Test student answer submission" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.599"/>
+  <testcase name="Test multiple choice selection" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.398"/>
+  <testcase name="Test questions are loaded correctly" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.022"/>
+  <testcase name="Test getId functionality" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.03"/>
+  <testcase name="Test database connection error handling" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.566"/>
+  <testcase name="Test question data integrity" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.039"/>
+  <testcase name="Test exam window creation with valid data" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.436"/>
+  <testcase name="Test exam window creation with invalid student" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.116"/>
+  <testcase name="Test exam submission validation" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.037"/>
+  <testcase name="Test exam window creation with non-existent exam" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.105"/>
+  <testcase name="Test score calculation" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.031"/>
+  <testcase name="Test window focus detection" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.077"/>
+  <testcase name="Test get correct answer functionality" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="0.034"/>
+  <testcase name="Test timer functionality" classname="com.ETP.ExamTakingSystem.UI.ExamTakingWindowTest" time="2.105"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Aug 01, 2025 9:59:44 AM com.sun.javafx.application.PlatformImpl startup
+WARNING: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @3972a855'
+]]></system-err>
+</testsuite>

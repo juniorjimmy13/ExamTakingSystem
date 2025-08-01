@@ -52,7 +52,8 @@ public class QuestionManagement {
     }
 
     private static void saveQuestion(String examTitle, String question, TextField[] options, String correct) {
-    if (question.isEmpty() || correct == null || options[0].getText().isEmpty() || options[1].getText().isEmpty() ||
+        // big if statement will look for a better solution
+        if (question.isEmpty() || correct == null || options[0].getText().isEmpty() || options[1].getText().isEmpty() ||
         options[2].getText().isEmpty() || options[3].getText().isEmpty()) {
         Alert alert = new Alert(Alert.AlertType.ERROR, "Please fill in all fields and select the correct answer.");
         alert.show();
@@ -60,7 +61,7 @@ public class QuestionManagement {
     }
 
     try (Connection conn = DatabaseManager.connect()) {
-        // Step 1: Get exam_id
+        // Get exam_id
         int examId = -1;
         String getExamIdSQL = "SELECT id FROM exams WHERE title = ?";
         try (PreparedStatement stmt = conn.prepareStatement(getExamIdSQL)) {
@@ -75,7 +76,7 @@ public class QuestionManagement {
             }
         }
 
-        // Step 2: Insert question
+        // Insert question
         String insertSQL = "INSERT INTO questions (exam_id, question_text, option_a, option_b, option_c, option_d, correct_option) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
             pstmt.setInt(1, examId);
@@ -158,6 +159,8 @@ public class QuestionManagement {
     window.setScene(scene);
     window.show();
 }
+    
+// This is the edit window almost the same as the create window but using the UPDATE query in SQL
 private static void openEditWindow(int questionId, String examTitle) {
     Stage editWindow = new Stage();
     editWindow.setTitle("Edit Question");

@@ -25,6 +25,8 @@ public class StudentLogin {
             String username = usernameField.getText();
             if (authenticate(username)) {
                 window.close();
+                
+                // we pass through the student username so that we can reference it for the rest of the student session
                 StudentDashboard.showWindow(username);
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid Student Username");

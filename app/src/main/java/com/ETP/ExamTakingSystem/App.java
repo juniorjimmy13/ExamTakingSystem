@@ -25,7 +25,7 @@ public class App extends Application{
         Button manageStudentsBtn = new Button("Manage Students");
         Button manageExamsBtn = new Button("Manage Exams");
         Button logoutBtn = new Button("Logout");
-        Button TestBtn = new Button("TestClient");
+        Button TestBtn = new Button("Student Login");
 
         manageStudentsBtn.setOnAction(e -> StudentManagment.showWindow());
         manageExamsBtn.setOnAction(e -> ExamManagement.showWindow());

@@ -11,8 +11,8 @@ package com.ETP.ExamTakingSystem;
 import java.sql.*;
 
 public class DatabaseManager {
-    private static final String URL = "jdbc:mysql://localhost:3306/exam_system"; // For XAMPP
-    private static final String DB_URL = "jdbc:sqlite:exam.db"; // Local
+    private static final String URL = "jdbc:mysql://localhost:3306/exam_system1"; // For XAMPP
+    private static final String DB_URL = "jdbc:sqlite:exam_system.db"; // Local
     private static final String USER = "root";
     private static final String PASSWORD = ""; // Default XAMPP password is empty
 
@@ -22,7 +22,7 @@ public class DatabaseManager {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Establish connection for Xamp
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+            return DriverManager.getConnection(URL,USER,PASSWORD);
             
             //return DriverManager.getConnection(DB_URL) // for local
         } catch (ClassNotFoundException | SQLException e) {

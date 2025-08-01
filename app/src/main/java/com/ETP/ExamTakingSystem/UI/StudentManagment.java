@@ -199,6 +199,7 @@ public class StudentManagment {
         }
     }
 
+    // When you double tap on a student result
     private static void showDetailedResults(String studentUsername, int examId) {
         Stage detailsWindow = new Stage();
         detailsWindow.setTitle("Exam Review");
@@ -227,7 +228,7 @@ public class StudentManagment {
                     String correct = rs.getString("correct_option");
                     String chosen = rs.getString("selected_option");
 
-                    String status = chosen.equals(correct) ? "✔ Correct" : "✘ Incorrect";
+                    String status = chosen.equals(correct) ? "Correct" : "Incorrect";
                     answersList.getItems().add(question + "\nYour Answer: " + chosen + " | Correct: " + correct + " " + status);
                 }
             }
